@@ -42,12 +42,12 @@ comments: true
 - -XX:GCTimeRatio：设置吞吐量大小，是0到100之间的整数（默认是99）
 - -XX:+ParallelGCThreads：设置垃圾收集时的线程数量
 #### 垃圾回收器种类
-        -XX:+UseSerialGC：使用串行回收器
-        -XX:+UseParNewGC：新生代使用ParNew并行回收器，老年代默认用串行回收器
-        -XX:UseParallelGC：新生代使用复制算法的GC，它非常关注系统的吞吐量（高并发业务使用）
-        -XX:UseParallelOldGC：老年代使用标记压缩法的回收器，也关注吞吐量
-        -XX:+UseConcMarkSweepGC：CMS回收器（目前主流），并发标记清除，主要关注系统停顿时间，因为这不是独占回收器，所以要保证内存够用。它不会等到应用程序饱和才去回收，而是在指定阈值时回收
-        -XX:+UseG1GC：G1回收器（jdk1.7后提出的），属于分代垃圾回收器，区分新生代和老年代，使用了分区算法
+	- -XX:+UseSerialGC：使用串行回收器
+	- -XX:+UseParNewGC：新生代使用ParNew并行回收器，老年代默认用串行回收器
+	- -XX:UseParallelGC：新生代使用复制算法的GC，它非常关注系统的吞吐量（高并发业务使用）
+	- -XX:UseParallelOldGC：老年代使用标记压缩法的回收器，也关注吞吐量
+	- -XX:+UseConcMarkSweepGC：CMS回收器（目前主流），并发标记清除，主要关注系统停顿时间，因为这不是独占回收器，所以要保证内存够用。它不会等到应用程序饱和才去回收，而是在指定阈值时回收
+	- -XX:+UseG1GC：G1回收器（jdk1.7后提出的），属于分代垃圾回收器，区分新生代和老年代，使用了分区算法
 
 ------------
 
