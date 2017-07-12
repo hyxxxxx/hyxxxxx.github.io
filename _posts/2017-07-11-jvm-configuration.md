@@ -3,7 +3,9 @@ layout: post
 title: "JVM参数配置"
 date: 2017-07-11
 excerpt: "A ton of text to test readability."
-tags: [test]
+tags: 
+- JVM
+- Java
 comments: true
 ---
 
