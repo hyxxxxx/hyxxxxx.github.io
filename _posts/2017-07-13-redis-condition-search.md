@@ -4,8 +4,8 @@ title: "Redis条件查询"
 date: 2017-07-13
 excerpt: "有时候我们会为了减轻关系数据库的压力，甚至是为了提升性能，把关系型数据库中某张经常被查询却很少修改的表..."
 tags: 
-- JVM
-- Java
+- Redis
+- 数据库
 comments: true
 ---
 
@@ -27,6 +27,6 @@ comments: true
 4. 则在插入HASH的同时把满足条件的用户ID存入一个SET中，SET的KEY就以该条件命名，如：`SYS_USER_SEL_AGE_25`
 5. 查询时先查SET的ID，再通过ID集合去查询HASH
 
-> 如果有**多条件**，则存入多个SET
-查询时将SET求交集或者并集，如REDIS的`SINTER`方法就是取交集
-再去HASH里得到结果
+		备注：如果有**多条件**，则存入多个SET
+		查询时将SET求交集或者并集，如REDIS的`SINTER`方法就是取交集
+		再去HASH里得到结果
