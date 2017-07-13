@@ -131,3 +131,6 @@ class MyObject {
     }
 }
 ```
+参考资料：
+
+[《Java并发编程的艺术》](https://book.douban.com/subject/26591326/ "《Java并发编程的艺术》")
