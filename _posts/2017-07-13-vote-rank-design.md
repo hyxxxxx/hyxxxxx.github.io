@@ -23,13 +23,13 @@ REDIS不仅高效快速，而且提供**ZSET**这种有序集合，当然就用�
 ### 业务场景
 下面给定一个业务场景来进行分析：
 
-每位选手都有自己所属的参赛地，以市为最小单位，上面还有省份，所以排行榜有三个维度分别是：**市排行**、**省排行**和**总排行**
+在排行榜中分别可以按**选手所在城市**、**选手所在省份**来查询排行列表，并且选手按照票数从高到低排列。
 
 ### 实现思路
 我们先从排行榜功能开始分析
 1. 首先我们把选手ID塞进ZSET来记录投票并排名，定义KEY为：`VOTE_RANK_SET`
 
-        每一个维度都定义一个标识，C代表市、P代表省、F代表所有
+        每一个维度都定义一个标识，C代表市、P代表省、F代表最大范围（包含所有选手）
         如果某城市的ID是520，就有一个ZSET集合的KEY为`VOTE_RANK_SET:C520`
         每个城市和省份的KEY都依次定义，集合的值就是该区域下的选手ID
         
@@ -45,6 +45,7 @@ REDIS不仅高效快速，而且提供**ZSET**这种有序集合，当然就用�
 多说无益，还是直接贴代码吧
 
 保存选手HASH
+
 `stringRedisTemplate.boundHashOps(key).putAll();`
 
 给选手投票，选手ID=1，所在城市ID=100，所在省份ID=1001
@@ -65,22 +66,30 @@ stringRedisTemplate.opsForZSet().incrementScore(key3, 选手ID, 票数);
 
 下面列举几个我们可能会使用到的接口：
 - 下面这两个方法是一回事，size调用zCard，就是返回该key的元素总数
-`Long size();`
-`Long zCard();`
+
+    `Long size();`
+    
+    `Long zCard();`
 - 获取元素的分数，这里元素就是选手ID，结果就是票数
-`Double score(Object o);`
+
+    `Double score(Object o);`
 - 获取给定分数段内的元素总数
-`Long count(double min, double max);`
+
+    `Long count(double min, double max);`
 - 第一个方法是按照元素下标的区间查询，第二个是按照得分的区间查询，返回值就是VALUE的集合
-`Set<V> reverseRange(long start, long end);`
-`Set<V> reverseRangeByScore(double min, double max);`
+
+    `Set<V> reverseRange(long start, long end);`
+    
+    `Set<V> reverseRangeByScore(double min, double max);`
 - 这两个方法的作用跟上面差不多，不同在于返回值是个对象集合，从这个对象中，我们可以取到该元素的VALUE和SCORE，这个还是比较有用的
-`Set<TypedTuple<V>> reverseRangeWithScores(long start, long end);`
-`Set<TypedTuple<V>> reverseRangeByScoreWithScores(double min, double max);`
+
+    `Set<TypedTuple<V>> reverseRangeWithScores(long start, long end);`
+    
+    `Set<TypedTuple<V>> reverseRangeByScoreWithScores(double min, double max);`
 	
     **reverse的意思是反转，意味着取出来的顺序是倒序的，这正是排行榜需要的顺序**
 
-现在取出该区域下的选手ID后，就要依次去查询选手的HASH列表了，这里要使用REDIS的管道技术，使这段操作可以高效稳定的执行
+现在取出该区域下的选手ID后，就要依次去查询选手的HASH列表了，这里要使用REDIS的**管道技术**，使这段操作可以高效稳定的执行
 
 stringRedisTemplate同样提供多种开启管道的方法，这里就不进行API的介绍了
 
@@ -105,3 +114,9 @@ return stringRedisTemplate.execute((RedisCallback<List<T>>) connection -> {
     return result;		//返回集合
  });
 ```
+
+到这里也就介绍的差不多了，但是不觉得很奇怪吗
+
+为什么不能按选手的姓名、编号等条件来查询呢？
+
+当然可以，但这个就用不上REDIS了，只能老老实实地去MYSQL里查咯~
