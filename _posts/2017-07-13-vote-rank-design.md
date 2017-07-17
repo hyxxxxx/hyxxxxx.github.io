@@ -106,7 +106,7 @@ return stringRedisTemplate.execute((RedisCallback<List<T>>) connection -> {
     connection.openPipeline();		//开启管道
     //循环选手ID的SET集合，
     for (TypedTuple<String> id : ids) {
-        Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(KEY);
+        Map<byte[], byte[]> map = connection.hGetAll(KEY..getBytes());
         //封装成对象<T>加入结果集
         result.add(T);
     }
