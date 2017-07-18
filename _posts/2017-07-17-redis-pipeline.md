@@ -11,6 +11,8 @@ tags:
 comments: true
 ---
 
+> 版权声明：本文为博主原创文章，未经博主允许不得转载。
+
 ### 什么是REDIS管道技术
 因为REDIS是一种基于客户端-服务端模型以及请求/响应协议的TCP服务，所以客户端会阻塞等待服务端的返回结果。
 
@@ -110,3 +112,6 @@ List<Object> executePipelined(final SessionCallback<?> session, final RedisSeria
             }
     });
     ```
+    
+总结：使用管道可以将多次REDIS操作在同一管道中执行，不仅提高效率而且节省了连接的占用，
+但是否使用管道还得根据具体情况而定，毕竟创建管道是需要消耗资源的。
