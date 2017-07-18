@@ -90,30 +90,28 @@ stringRedisTemplate.opsForZSet().incrementScore(key3, 选手ID, 票数);
 	
     **reverse的意思是反转，意味着取出来的顺序是倒序的，这正是排行榜需要的顺序**
 
-现在取出该区域下的选手ID后，就要依次去查询选手的HASH列表了，这里要使用REDIS的**管道技术**，使这段操作可以高效稳定的执行
+现在取出该区域下的选手ID后，就要依次去查询选手的HASH列表了，这里我使用REDIS的**管道技术**，使这段操作可以高效稳定的执行
 
-stringRedisTemplate同样提供多种开启管道的方法，这里就不进行API的介绍了
+stringRedisTemplate同样提供多种开启管道的方法，这里就不进行API的介绍了，可以参考我的另一篇博客[《Redis管道技术应用》](http://blog.yasin.life/redis-pipeline/ "《Redis管道技术应用》")
 
 总之，把HASH查询出来并封装成对象，包括统计这个选手的票数什么的操作都放在管道中处理就好
 
 大致逻辑如下：
 ```java
-//分页查询选手ID
-Set<TypedTuple<String>> ids = stringRedisTemplate.opsForZSet()
-    .reverseRangeByScoreWithScores(KEY, Integer.MIN_VALUE, Integer.MAX_VALUE, pageNum, pageSize);
-
-return stringRedisTemplate.execute((RedisCallback<List<T>>) connection -> {
-    List<T> result = new ArrayList<>();
-    connection.openPipeline();		//开启管道
-    //循环选手ID的SET集合，
-    for (TypedTuple<String> id : ids) {
+//开启管道
+stringRedisTemplate.executePipelined((RedisCallback<List<T>>) connection -> {
+    //先按倒序查询出该维度的选手ID
+    Set<RedisZSetCommands.Tuple> ids =
+            connection.zRangeByScoreWithScores(KEY.getBytes(), Integer.MIN_VALUE, Integer.MAX_VALUE, pageNum, pageSize);
+    List<T> result = new ArrayList<T>(ids.size());
+    //遍历每个ID分别查询出对应的HASH列表
+    ids.forEach(id -> {
         Map<byte[], byte[]> map = connection.hGetAll(KEY.getBytes());
         //封装成对象<T>加入结果集
         result.add(T);
-    }
-    connection.closePipeline();		//关闭管道
-    return result;		//返回集合
- });
+    });
+    return result;
+});
 ```
 
 到这里也就介绍的差不多了，但是不觉得很奇怪吗
