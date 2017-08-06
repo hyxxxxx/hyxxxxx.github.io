@@ -2,7 +2,7 @@
 layout: post
 title: "数据结构及算法——排序"
 date: 2017-08-06
-excerpt: "主要介绍几个基本算法"
+excerpt: "主要介绍几个基本排序算法"
 tags: 
 - Original
 - Java
@@ -260,6 +260,7 @@ comments: true
 
 # 非比较类排序
 
+未完待续...
 
 ## 桶排序
 
